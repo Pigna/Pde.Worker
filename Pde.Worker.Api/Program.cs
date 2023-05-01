@@ -1,5 +1,5 @@
 using Hangfire;
-using Hangfire.MemoryStorage;
+using Hangfire.PostgreSql;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -14,7 +14,7 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddHangfire(config => config.SetDataCompatibilityLevel(CompatibilityLevel.Version_170)
     .UseSimpleAssemblyNameTypeSerializer()
     .UseDefaultTypeResolver()
-    .UseMemoryStorage());
+    .UsePostgreSqlStorage("Host=localhost;Port=32768;Username=postgres;Password=postgrespw;Database=postgres;"));
 
 //Add hangfire server
 builder.Services.AddHangfireServer();
