@@ -1,23 +1,9 @@
+using Pde.Worker.Api.Extensions;
 using Hangfire;
-using Hangfire.PostgreSql;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-
-builder.Services.AddControllers();
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
-
-//Add hangfire with in-memory storage
-builder.Services.AddHangfire(config => config.SetDataCompatibilityLevel(CompatibilityLevel.Version_170)
-    .UseSimpleAssemblyNameTypeSerializer()
-    .UseDefaultTypeResolver()
-    .UsePostgreSqlStorage("Host=localhost;Port=32768;Username=postgres;Password=postgrespw;Database=postgres;"));
-
-//Add hangfire server
-builder.Services.AddHangfireServer();
+builder.Services.AddPdeWorkerApiServices(builder.Configuration);
 
 var app = builder.Build();
 

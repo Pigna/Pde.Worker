@@ -2,6 +2,8 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Pde.Worker.Api", "Pde.Worker.Api\Pde.Worker.Api.csproj", "{A714B660-B585-4080-ABF9-93D5CF34FF36}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Pde.Worker.Core", "Pde.Worker.Core\Pde.Worker.Core.csproj", "{2C64B7F7-E3A4-4B63-A411-FFF91D189060}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -12,5 +14,9 @@ Global
 		{A714B660-B585-4080-ABF9-93D5CF34FF36}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A714B660-B585-4080-ABF9-93D5CF34FF36}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A714B660-B585-4080-ABF9-93D5CF34FF36}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2C64B7F7-E3A4-4B63-A411-FFF91D189060}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2C64B7F7-E3A4-4B63-A411-FFF91D189060}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2C64B7F7-E3A4-4B63-A411-FFF91D189060}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2C64B7F7-E3A4-4B63-A411-FFF91D189060}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
