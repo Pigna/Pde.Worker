@@ -1,5 +1,6 @@
 using Hangfire;
 using Microsoft.AspNetCore.Mvc;
+using Pde.Worker.Core.Contracts;
 using Pde.Worker.Core.Services;
 
 namespace Pde.Worker.Api.Controllers;
@@ -9,18 +10,18 @@ namespace Pde.Worker.Api.Controllers;
 public class HangfireJobController : ControllerBase
 {
     private readonly IBackgroundJobClient _backgroundJobClient;
-    private readonly ITestService _testService;
+    private readonly IExportService _exportService;
 
-    public HangfireJobController(IBackgroundJobClient backgroundJobClient, ITestService testService)
+    public HangfireJobController(IBackgroundJobClient backgroundJobClient, IExportService exportService)
     {
         _backgroundJobClient = backgroundJobClient;
-        _testService = testService;
+        _exportService = exportService;
     }
 
-    [HttpGet(Name = "Get")]
-    public IActionResult Get()
+    [HttpPost]
+    public async Task<OkObjectResult> DatabaseExportJob([FromBody] SubmitExportDataRequest request)
     {
-        Console.WriteLine(_backgroundJobClient.Enqueue(() => _testService.Test("Hangfire!")));
-        return new AcceptedResult();
+        Console.WriteLine("Hangfire job fired!");
+        return Ok(_backgroundJobClient.Enqueue(() => _exportService.SubmitExportData(request)));
     }
 }
