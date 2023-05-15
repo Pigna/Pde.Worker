@@ -10,5 +10,6 @@ public interface IDbExportProvider
         string password,
         string host,
         string port,
-        string database);
+        string database,
+        int offset);
 }
