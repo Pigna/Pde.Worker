@@ -9,17 +9,23 @@ public class ExportService : IExportService
 {
     private readonly IFakeDataService _fakeDataService;
     private readonly IDbExportProvider _provider;
+    private readonly IFileWriterService _fileWriterService;
 
-    public ExportService(IDbExportProvider provider, IFakeDataService fakeDataService)
+    public ExportService(IDbExportProvider provider, IFakeDataService fakeDataService, IFileWriterService fileWriterService)
     {
         _fakeDataService = fakeDataService;
         _provider = provider;
+        _fileWriterService = fileWriterService;
     }
 
     public SubmitExportResponse SubmitExportData(SubmitExportDataRequest request)
     {
+        const int stepSize = 2;
         var combined = request.ExportDataViewModels.GroupBy(item => item.TableName).ToList();
         var tableDataResult = new List<TableData>();
+        
+        //Write SQL db create file
+        _fileWriterService.CreateTables(request.ExportDataViewModels, request.DatabaseConnectionInfo.Database);
 
         foreach (var table in combined)
         {
@@ -31,8 +37,6 @@ public class ExportService : IExportService
                 .ToList();
             
             var progression = 0;
-            //Request database size
-            //For(var i = 0; i<size; i++)
             while (true)
             {
                 //Grab a data batch
@@ -44,41 +48,40 @@ public class ExportService : IExportService
                         request.DatabaseConnectionInfo.Host,
                         request.DatabaseConnectionInfo.Port,
                         request.DatabaseConnectionInfo.Database,
-                        progression)
+                        progression,
+                        stepSize)
                     .Result;
-                Console.WriteLine(table.Key + " -> Got a data batch");
 
-                if (columnsToAdd.Count > 0)
-                {
-                    //Insert fake data
-                    foreach (var row in tableData.Data)
-                    {
-                        //TODO: What to do if a seed is a string?
-                        var firstValue = row!.FirstOrDefault().Value;
-                        var seed = Convert.ToInt32(firstValue);
-                        foreach (var column in columnsToAdd)
-                            row?.Add(column.ColumnName, _fakeDataService.GetFakerDataByType(column.DataType, seed));
-                    }
-                }
-                Console.WriteLine(table.Key + " -> Filled a data batch with fake data");
+                InsertFakeData(columnsToAdd, tableData);
+
+                //Write data import script to file
+                _fileWriterService.InsertData(tableData, request.DatabaseConnectionInfo.Database);
                 
-                //TODO: --Write to file
-                tableDataResult.Add(tableData);
-                if (tableData.Data.Count() < 2)
+                if (tableData.Data != null && tableData.Data.Count < stepSize)
                 {
-                    Console.WriteLine(table.Key + " -> Table is done");
                     break;
                 }
 
-                progression += 2;
+                progression += stepSize;
             }
         }
-
-        Console.WriteLine("Job's done!");
         return new SubmitExportResponse
         {
             Result = SubmitExportResult.Success,
             Value = tableDataResult
         };
+    }
+
+    private void InsertFakeData(List<ExportDataViewModel> columnsToAdd, TableData tableData)
+    {
+        if (columnsToAdd.Count <= 0) return;
+        foreach (var row in tableData.Data!)
+        {
+            //TODO: What to do if a seed is a string?
+            var firstValue = row!.FirstOrDefault().Value;
+            var seed = Convert.ToInt32(firstValue);
+            foreach (var column in columnsToAdd)
+                row?.Add(column.ColumnName, _fakeDataService.GetFakerDataByType(column.DataType, seed));
+        }
     }
 }

@@ -20,10 +20,11 @@ public class PostgresExportProvider : IDbExportProvider
         string host,
         string port,
         string database,
-        int offset
+        int offset,
+        int stepSize
         )
     {
-        var sqlSelectQuery = CreateSqlQuery(tableName, columns, offset);
+        var sqlSelectQuery = CreateSqlQuery(tableName, columns, offset, stepSize);
         var connectionString = _connectionFactory.CreateConnectionString(username, password, host, port, database);
         using var databaseConnection = _connectionFactory.Connect(connectionString);
         var queryResult = (await databaseConnection.QueryAsync<dynamic>(sqlSelectQuery)).ToList();
@@ -44,10 +45,10 @@ public class PostgresExportProvider : IDbExportProvider
         return tableData;
     }
 
-    private static string CreateSqlQuery(string tableName, ICollection<string> columns, int offset)
+    private static string CreateSqlQuery(string tableName, ICollection<string> columns, int offset, int stepSize)
     {
         var preparedColumns = string.Join(",", columns.Select(columnName => $"\"{columnName}\""));
-        var selectQuery = @$"SELECT {preparedColumns} FROM ""{tableName}"" ORDER BY CURRENT_TIMESTAMP OFFSET {offset} ROWS FETCH NEXT 2 ROWS ONLY;";
+        var selectQuery = @$"SELECT {preparedColumns} FROM ""{tableName}"" ORDER BY CURRENT_TIMESTAMP OFFSET {offset} ROWS FETCH NEXT {stepSize} ROWS ONLY;";
         return selectQuery;
     }
 }

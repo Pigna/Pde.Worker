@@ -12,6 +12,7 @@ public static class ServiceCollectionExtensions
     {
         services.AddTransient<IFakeDataService, FakeDataService>();
         services.AddTransient<IExportService, ExportService>();
+        services.AddTransient<IFileWriterService, FileWriterService>();
 
         services.AddDependencies(configuration);
     }

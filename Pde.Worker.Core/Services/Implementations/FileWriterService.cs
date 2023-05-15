@@ -4,11 +4,11 @@ using Pde.Worker.Data.Models;
 
 namespace Pde.Worker.Core.Services.Implementations;
 
-internal static class Exporter
+internal class FileWriterService : IFileWriterService
 {
-    public static void CreateTables(IEnumerable<ExportDataViewModel> exportData)
+    public void CreateTables(IEnumerable<ExportDataViewModel> exportData, string projectName)
     {
-        const string fileName = "ProjectName_Tables.sql";
+        var fileName = $"{projectName}.sql";
 
         var tables = exportData.GroupBy(table => table.TableName);
 
@@ -19,24 +19,29 @@ internal static class Exporter
             scriptBuilder.AppendJoin(", ", table.Select(column => $"\"{column.ColumnName}\" {column.DataType}"));
             scriptBuilder.AppendLine(");");
         }
-        
         File.WriteAllText(fileName, scriptBuilder.ToString());
     }
 
-    public static void InsertData(TableData exportData)
+    public void InsertData(TableData exportData, string projectName)
     {
         if (exportData.Data == null) return;
         
-        var fileName = $"ProjectName_Insert_{exportData.TableName}.sql";
-        
-        using var writer = new StreamWriter(fileName);
+        var fileName = $"{projectName}.sql";
+
+        using var writer = File.AppendText(fileName);
         foreach (var row in exportData.Data)
         {
             var columns = string.Join(", ", row.Select(column => $"\"{column.Key}\""));
             var data = string.Join(", ", row.Select(column => $"\"{column.Value}\""));
 
             writer.WriteLine($"INSERT INTO {exportData.TableName} ({columns}) VALUES ({data});");
+            
         }
+    }
+
+    public void AddConstraints(object data, string projectName)
+    {
+        throw new NotImplementedException();
     }
 }
 

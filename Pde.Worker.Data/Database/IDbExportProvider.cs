@@ -11,5 +11,6 @@ public interface IDbExportProvider
         string host,
         string port,
         string database,
-        int offset);
+        int offset,
+        int stepSize);
 }
