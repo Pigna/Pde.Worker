@@ -21,7 +21,6 @@ public class HangfireJobController : ControllerBase
     [HttpPost]
     public async Task<OkObjectResult> DatabaseExportJob([FromBody] SubmitExportDataRequest request)
     {
-        Console.WriteLine("Hangfire job fired!");
         return Ok(_backgroundJobClient.Enqueue(() => _exportService.SubmitExportData(request)));
     }
 }
